@@ -1,0 +1,65 @@
+/*
+Copyright (C) 2020 Taryn Nelson
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+/* 
+    Created on : 31-Mar-2020, 1:26:14 PM
+    Author     : Taryn Nelson
+*/
+
+.root, #startPaneBg{
+    -fx-background-image: url("../images/marble.jpeg");
+}
+
+#numPosition{
+    -fx-pref-width: 50px;
+}
+
+#txtJump{
+    -fx-font-weight: bold;
+}
+
+#startPaneMain{
+    -fx-background-image: url("../images/border.png");
+    -fx-alignment: center;
+}
+
+#title{
+    -fx-font-family: Edwardian Script ITC;
+    -fx-font-size: 200%;
+    -fx-text-align: center;
+    
+}
+
+#lblBoardSize{
+    -fx-font-weight: bold;
+}
+
+#exit, #begin, #exit2, #return, #jump{
+    -fx-background-image: url("../images/marble.jpeg");
+    -fx-pref-width: 80px;
+    -fx-font-weight: bold;
+}
+
+
+#txtPosition{
+    -fx-font-size: 150%;
+    -fx-font-weight: bold;
+}
+
+#nextPane, #prevPane{
+    -fx-background-color: rgba(0,0,0,0);
+}
+
