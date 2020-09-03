@@ -37,13 +37,18 @@ public class Node {
     */
    protected Node prev;
    
+   protected int positionNum;
+   
    /**
     * Constructor creates a node with provided pane and null next/prev nodes.
     * @param pane BoardPane to be associated with current node.
+    * @param positionNum Position number of the Node.
     */
-   public Node(BoardPane pane){
+   public Node(BoardPane pane, int positionNum){
        this.pane = pane;
+       this.positionNum = positionNum;
        prev = null;
        next = null;
    }
+   
 }

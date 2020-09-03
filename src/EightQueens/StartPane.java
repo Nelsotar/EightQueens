@@ -117,7 +117,7 @@ public class StartPane extends StackPane{
      * Places elements of StartPane in grid to create layout.
      */
     final private void setStartPane(){
-        main.setMaxSize(400,500);
+        main.setMaxSize(400,525);
         
         //setting column widths
         ColumnConstraints col1 = new ColumnConstraints();
@@ -184,6 +184,8 @@ public class StartPane extends StackPane{
         list.add("8 x 8");
         list.add("9 x 9");
         list.add("10 x 10");
+        list.add("11 x 11");
+        list.add("12 x 12");
         ObservableList<String> options = FXCollections.observableArrayList(list);
         
         boardSize =  new ComboBox(options);
@@ -196,7 +198,7 @@ public class StartPane extends StackPane{
      */
     private int getSize(){
         int size = 4;
-
+        
         if(boardSize.getValue().equals("5 x 5")){
             size = 5;
         }
@@ -218,6 +220,12 @@ public class StartPane extends StackPane{
         else if(boardSize.getValue().equals("10 x 10")){
             size = 10;
         }
+        else if(boardSize.getValue().equals("11 x 11")){
+            size = 11;
+        }
+        else if(boardSize.getValue().equals("12 x 12")){
+            size = 12;
+        }
         
         return size;
     }
@@ -235,6 +243,15 @@ public class StartPane extends StackPane{
             stage.setWidth(600);
             stage.setHeight(725);
         }
+        else if(size == 11){
+            stage.setWidth(650);
+            stage.setHeight(790);
+        }
+        else if(size == 12){
+            stage.setWidth(700);
+            stage.setHeight(830);
+        }
+ 
     }
     
     /**
@@ -244,9 +261,7 @@ public class StartPane extends StackPane{
         //generates all possible solution boards
         PositionGenerator positionGenerator = new PositionGenerator(getSize(), rootPane, stage);
         //set the top and bottom banners of each solution board
-        positionGenerator.setTopBanners();
-        positionGenerator.setBottomBanners();
-        
+        //positionGenerator.setTopBanners();
         //changes the size of the application if needed
         changeAppSize();
         

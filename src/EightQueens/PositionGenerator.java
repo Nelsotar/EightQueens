@@ -16,6 +16,7 @@
  */
 package EightQueens;
 
+import java.util.ArrayList;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -35,7 +36,7 @@ import javafx.stage.Stage;
  * @author Taryn Nelson
  * @since 2020-03-29
  */
-public class PositionGenerator {
+public final class PositionGenerator {
     /**
      * positions - Circular linked list containing all solutions found for provided 
      * board size.
@@ -48,6 +49,12 @@ public class PositionGenerator {
     char[][] chessBoard;
     
     /**
+     * solutions - ArrayList of char arrays containing all generated solutions 
+     * to the n queens problem.
+     */
+    ArrayList<char[][]> solutions = new ArrayList();
+    
+    /**
      * boardSize - Size of chessboard to find solutions for.
      */
     int boardSize;
@@ -55,7 +62,7 @@ public class PositionGenerator {
     /**
      * solutionCount - number of solutions found for current board size.
      */
-    int solutionCount = 0;
+   // int solutionCount = 0;
     
     /**
      * rootPane - The application's root pane.
@@ -82,48 +89,57 @@ public class PositionGenerator {
      */
     protected PositionGenerator(int size, StackPane rootPane, Stage stage){
         boardSize = size;
-        positions = new CircularLinkedList();
+        positions = new CircularLinkedList();  
         chessBoard = new char[size][size];
         this.rootPane = rootPane;
         this.stage = stage;
         solveEightQueens(0);
+        generateCircularLL();
+        //Creates the first solution pane
+        createSolutionPane(1);
     }
     
     /**
-     * Creates and sets the top banner for each BoardPane that was generated. 
-     * Each banner contains the board size, the position number, and the total positions.
+     * generates nodes with null panes, one for each n queens solution found.
      */
-    public void setTopBanners(){
-        positions.getFirst();
-        VBox bannerTxt;
-        StackPane banner;
-        ImageView bannerBG;
-        for(int i = 0; i < positions.size(); i++){
-            banner = new StackPane();
-            
-            bannerBG = new ImageView("images/tbanner.png"); 
-            
-            bannerTxt = new VBox();
-            bannerTxt.setAlignment(Pos.CENTER);
-            Text txtBoardSize = new Text("Board size: " + boardSize + " x " + boardSize);
-            Text txtPosition = new Text("Position: " + positions.currentNode.pane.getPositionNum() + " / " + positions.size());
-            txtPosition.setId("txtPosition");
-            bannerTxt.getChildren().addAll(txtBoardSize, txtPosition);
-            banner.getChildren().addAll(bannerBG, bannerTxt);      
-            positions.currentNode.pane.setTop(banner);
-            positions.currentNode.pane.setAlignment(positions.currentNode.pane.getTop(), Pos.CENTER);
-            positions.getNextNode();
+    private void generateCircularLL(){
+        for (int i = 1; i <= solutions.size(); i++) {
+            positions.add(null);
         }
     }
     
     /**
-     * Creates and sets the bottom banner for each BoardPane that was generated. 
+     * Creates and sets the top banner for the provided BorderPane 
+     * Each banner contains the board size, the position number, and the total positions.
+     * @param pane - the BoardPane to set the banner for.
+     * @param solutionNum - The number of the solution.
+     */   
+     public void setTopBanner(BoardPane pane, int solutionNum){
+        VBox bannerTxt;
+        StackPane banner;
+        ImageView bannerBG;
+        banner = new StackPane();
+            
+        bannerBG = new ImageView("images/tbanner.png"); 
+            
+        bannerTxt = new VBox();
+        bannerTxt.setAlignment(Pos.CENTER);
+        Text txtBoardSize = new Text("Board size: " + boardSize + " x " + boardSize);
+        Text txtPosition = new Text("Position: " + solutionNum + " / " + positions.size());
+        txtPosition.setId("txtPosition");
+        bannerTxt.getChildren().addAll(txtBoardSize, txtPosition);
+        banner.getChildren().addAll(bannerBG, bannerTxt);      
+        pane.setTop(banner);
+        BoardPane.setAlignment(pane.getTop(), Pos.CENTER);
+    }
+    
+    /**
+     * Creates and sets the bottom banner for provided BoardPane
      * Each banner contains a return and exit button, as well as a field for 
      * jumping to specific positions.
+     * @param pane - BoardPane to set banner for
      */
-    protected void setBottomBanners(){
-        positions.getFirst();
-        for(int i = 0; i < positions.size(); i++){
+    protected void setBottomBanner(BoardPane pane){
             StackPane banner = new StackPane();
             GridPane bannerTxt = new GridPane();
             bannerTxt.setAlignment(Pos.CENTER);
@@ -139,8 +155,8 @@ public class PositionGenerator {
         
             Text txtJump =  new Text("Jump to Position:");
             txtJump.setId("txtJump");
-            positions.getCurrentPane().numPosition = new TextField(); 
-            positions.getCurrentPane().numPosition.setId("numPosition");
+            pane.numPosition = new TextField(); 
+            pane.numPosition.setId("numPosition");
             Button btnJump = new Button("Jump");
             btnJump.setId("jump");
             btnJump.setOnAction(e->{jump();});
@@ -149,17 +165,14 @@ public class PositionGenerator {
             bannerTxt.setHgap(10);
         
             bannerTxt.add(txtJump, 0,0);
-            bannerTxt.add(positions.getCurrentPane().numPosition, 1,0);
+            bannerTxt.add(pane.numPosition, 1,0);
             bannerTxt.add(btnJump, 2,0);
             bannerTxt.add(btnReturn, 0,1);
             bannerTxt.add(btnExit, 2,1);
         
             banner.getChildren().addAll(bannerBG, bannerTxt);
         
-            positions.currentNode.pane.setBottom(banner);
-            positions.getNextNode();
-        }
-        
+            pane.setBottom(banner);  
     }
     
     /**
@@ -173,6 +186,7 @@ public class PositionGenerator {
         if(num.matches("\\d+")){
             int positionNumber = Integer.parseInt(num);
             if(positionNumber != positions.getCurrentPane().getPositionNum() && positionNumber > 0 && positionNumber <= positions.size()){
+                createSolutionPane(positionNumber);
                 BoardPane newPane = positions.getPaneAtPosition(positionNumber);
                 positions.getCurrentPane().numPosition.setText("");
                 rootPane.getChildren().clear();
@@ -209,19 +223,25 @@ public class PositionGenerator {
     }
     
     /**
-     * Displays the next BoardPane in positions.
+     * Displays the next BoardPane in positions. Creates the BoardPane if it 
+     * doesn't already exist.
      */
     private void nextPane(){
         rootPane.getChildren().clear();
-        rootPane.getChildren().add(positions.getNextPane());
+        positions.getNextNode();
+        createSolutionPane(positions.getCurrentPositionNum());
+        rootPane.getChildren().add(positions.getCurrentPane());
     }
     
     /**
-     * Displays the previous BoardPane in positions.
+     * Displays the previous BoardPane in positions. Creates the BoardPane if 
+     * it doesn't already exist.
      */
     private void previousPane(){
         rootPane.getChildren().clear();
-        rootPane.getChildren().add(positions.getPreviousPane());
+        positions.getPreviousPane();
+        createSolutionPane(positions.getCurrentPositionNum());
+        rootPane.getChildren().add(positions.getCurrentPane());
     }
     
     /**
@@ -262,7 +282,7 @@ public class PositionGenerator {
         }
         
     }
-    
+       
     /**
      * Method determines if a certain position is in danger of attack from 
      * previously placed queens.
@@ -273,30 +293,25 @@ public class PositionGenerator {
     private boolean isForbidden(int column, int row){
         boolean isForbidden = false;
         int tempRow = row;
-        int tempColumn = column;
         int tempRow2 = row;
         int tempColumn2 = column;
         
         for(int i = 0; i < chessBoard.length;i++){
-            if(chessBoard[column][i] == 'o' || chessBoard[i][row] == 'o'){
+            if(chessBoard[column][i] == 'o'){
+                return true;
+            }
+        }
+        
+        for(int i = 0; i < column;i++){
+            if(chessBoard[i][row] == 'o'){
                 isForbidden = true;
                 break;
             }
             
             tempRow++;
-            tempColumn++;
             tempRow2--;
             tempColumn2--;
-            
-            if(tempRow < chessBoard.length && tempColumn < chessBoard.length && chessBoard[tempColumn][tempRow] == 'o'){
-                isForbidden = true;
-                break;
-            }
             if(tempRow2 >= 0 && tempColumn2 >= 0 && chessBoard[tempColumn2][tempRow2] == 'o'){
-                isForbidden = true;
-                break;
-            }
-            if(tempRow2 >= 0 && tempColumn < chessBoard.length && chessBoard[tempColumn][tempRow2] == 'o'){
                 isForbidden = true;
                 break;
             }
@@ -309,47 +324,66 @@ public class PositionGenerator {
     }
     
     /**
-     * Method creates a BoardPane and sets a valid solution on it, and adds 
-     * navigation buttons.
+     * Copies the chessBoard array containing the valid position of queens and 
+     * passes it into the solutions ArrayList.
      */
     public void printBoard(){
-        solutionCount++;
-        BoardPane pane = new BoardPane(solutionCount, boardSize);
-        pane.setSolution(chessBoard);
+        char[][] newArray = new char[chessBoard.length][chessBoard.length];
+        for(int i = 0; i < chessBoard.length; i++){
+            for(int j = 0; j < chessBoard.length; j++){
+                newArray[i][j] = chessBoard[i][j];
+            }
+        }
+        solutions.add(solutions.size(), newArray); 
+    }
+    
+    /**
+     * Creates a BoardPane and adds it to the positions Circular Linked List at 
+     * the appropriate position.
+     * @param solutionNum - The solution number, determines where in the linked 
+     * list the BoardPane will be placed.
+     */
+    public void createSolutionPane(int solutionNum){
+        if(positions.getPaneAtPosition(solutionNum) == null){
+            BoardPane pane = new BoardPane(solutionNum, boardSize);
+            pane.setSolution(solutions.get(solutionNum - 1));
+            
+            Image leftImage = new Image("images/left2.png");
+            Image leftImageClicked = new Image("images/leftclicked.png");
+            Image rightImage = new Image("images/right2.png");
+            Image rightImageClicked = new Image("images/rightclicked.png");
         
-        Image leftImage = new Image("images/left2.png");
-        Image leftImageClicked = new Image("images/leftclicked.png");
-        Image rightImage = new Image("images/right2.png");
-        Image rightImageClicked = new Image("images/rightclicked.png");
+            ImageView left = new ImageView(leftImage);
+            ImageView right = new ImageView(rightImage);
         
-        ImageView left = new ImageView(leftImage);
-        ImageView right = new ImageView(rightImage);
+            Button nextPane = new Button("", right);
+            Button prevPane = new Button("", left);
+            nextPane.setId("nextPane");
+            prevPane.setId("prevPane");
         
-        Button nextPane = new Button("", right);
-        Button prevPane = new Button("", left);
-        nextPane.setId("nextPane");
-        prevPane.setId("prevPane");
+            nextPane.setOnMousePressed(e->{
+                right.setImage(rightImageClicked);
+            });
+            nextPane.setOnMouseReleased(e->{
+                right.setImage(rightImage);
+                nextPane();
+            });
         
-        nextPane.setOnMousePressed(e->{
-            right.setImage(rightImageClicked);
-        });
-        nextPane.setOnMouseReleased(e->{
-            right.setImage(rightImage);
-            nextPane();
-        });
-        
-        prevPane.setOnMousePressed(e->{
-            left.setImage(leftImageClicked);
-        });
-        prevPane.setOnMouseReleased(e->{
-            left.setImage(leftImage);
-            previousPane();
-        });
+            prevPane.setOnMousePressed(e->{
+                left.setImage(leftImageClicked);
+            });
+            prevPane.setOnMouseReleased(e->{
+                left.setImage(leftImage);
+                previousPane();
+            });
 
-        pane.setLeft(prevPane);
-        pane.setRight(nextPane);
-        BoardPane.setAlignment(pane.getLeft(), Pos.CENTER);
-        BoardPane.setAlignment(pane.getRight(), Pos.CENTER);
-        positions.add(pane);
+            pane.setLeft(prevPane);
+            pane.setRight(nextPane);
+            setBottomBanner(pane);
+            setTopBanner(pane, solutionNum);
+            BoardPane.setAlignment(pane.getLeft(), Pos.CENTER);
+            BoardPane.setAlignment(pane.getRight(), Pos.CENTER);
+            positions.replacePaneAtPosition(solutionNum, pane);
+        }
     }
 }

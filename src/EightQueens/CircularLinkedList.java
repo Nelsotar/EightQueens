@@ -26,28 +26,28 @@ public class CircularLinkedList {
     /**
      * head - head node
      */
-    Node head;
+    private Node head;
     
     /**
      * tail - tail node
      */
-    Node tail;
+    private Node tail;
     
     /**
      * nodeCount - number of nodes in list
      */
-    int nodeCount;
+    private int nodeCount;
     
     /**
      * prevNode - holds previous node for setting previous node to the node 
      * after it.
      */ 
-    Node prevNode;
+    private Node prevNode;
     
     /**
      * currentNode - node that is currently pointed at by the list.
      */
-    Node currentNode;
+    private Node currentNode;
     
     /**
      * No-arg constructor sets the head and tail to null and nodeCount to zero.
@@ -61,7 +61,7 @@ public class CircularLinkedList {
      * Method returns the number of nodes in list.
      * @return number of nodes in list
      */
-    public int size(){
+    protected int size(){
         return nodeCount;
     }
     
@@ -69,8 +69,8 @@ public class CircularLinkedList {
      * Method accepts a BoardPane and creates a node + adds it to the list.
      * @param pane BoardPane to be encapsulated in new node
      */
-    public void add(BoardPane pane){
-        Node newNode = new Node(pane);
+    protected void add(BoardPane pane){
+        Node newNode = new Node(pane, nodeCount + 1);
         if(nodeCount == 0){
             head = tail = prevNode = newNode;
             currentNode = head;
@@ -82,8 +82,7 @@ public class CircularLinkedList {
             tail.prev = prevNode;
             tail.next = head;
             head.prev = tail;
-        }
-        
+        }    
         nodeCount++;
     }
     
@@ -91,7 +90,7 @@ public class CircularLinkedList {
      * Returns the next node's pane and sets current node to next node.
      * @return the next node's BoardPane 
      */
-    public BoardPane getNextPane(){
+    protected BoardPane getNextPane(){
         getNextNode();
         return currentNode.pane;
     }
@@ -100,7 +99,7 @@ public class CircularLinkedList {
      * Returns the previous node's pane and sets current node to previous node.
      * @return the previous node's BoardPane
      */
-    public BoardPane getPreviousPane(){
+    protected BoardPane getPreviousPane(){
         getPreviousNode();
         return currentNode.pane;
     }
@@ -109,7 +108,7 @@ public class CircularLinkedList {
      * Returns the current node's pane.
      * @return the current node's BoardPane
      */
-    public BoardPane getCurrentPane(){
+    protected BoardPane getCurrentPane(){
         return currentNode.pane;
     }
     
@@ -117,7 +116,7 @@ public class CircularLinkedList {
      * Returns the head node.
      * @return head 
      */
-    public BoardPane getFirst(){
+    protected BoardPane getFirst(){
         currentNode = head;
         return currentNode.pane;
     }
@@ -125,33 +124,54 @@ public class CircularLinkedList {
     /**
      * Sets current node to next node.
      */
-    public void getNextNode(){
+    protected void getNextNode(){
         currentNode = currentNode.next;
     }
     
     /**
      * Sets current node to previous node.
      */
-    public void getPreviousNode(){
+    protected void getPreviousNode(){
         currentNode = currentNode.prev;
     }
     
     /**
      * Returns the BoardPane that has position number corresponding to argument
      * @param position solution number of the BoardPane
-     * @return 
+     * @return BoardPane of specified Node.
      */
-    public BoardPane getPaneAtPosition(int position){
+    protected BoardPane getPaneAtPosition(int position){
         if(position <= nodeCount && position >= 1){
-            BoardPane pane = currentNode.pane;
-            while(pane.getPositionNum() != position){
-                pane = getNextPane();
+            while(currentNode.positionNum != position){
+               // System.out.println(currentNode.positionNum);
+                getNextNode();
             }
-            return pane;
+            return currentNode.pane;       
         }else{
             return null;
         }
         
+    }
+    
+    /**
+     * Replaces the BoardPane in the specified node with provided BoardPane.
+     * @param position - Specifies which node to replace the BoardPane in.
+     * @param replacementPane - The BoardPane to replace with.
+     */
+    protected void replacePaneAtPosition(int position, BoardPane replacementPane){
+        if(position <= nodeCount && position >= 1){
+            while(currentNode.positionNum != position){
+                getNextNode();
+            }
+            currentNode.pane = replacementPane;       
+        } 
+    }
+    
+    /**
+     * @return The current position number of the node.
+     */
+    protected int getCurrentPositionNum(){
+        return currentNode.positionNum;
     }
     
 }

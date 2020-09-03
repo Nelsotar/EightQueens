@@ -115,6 +115,7 @@ public class BoardPane extends BorderPane{
        Image queenImage = new Image("images/Queen.png");
 
         for(int i = 0; i < boardSize ; i++){
+            
             queen = new ImageView(queenImage);
             for(int j = 0; j < boardSize; j++){
                 if(solution[i][j] == 'o'){
