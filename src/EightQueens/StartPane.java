@@ -117,7 +117,7 @@ public class StartPane extends StackPane{
      * Places elements of StartPane in grid to create layout.
      */
     final private void setStartPane(){
-        main.setMaxSize(400,525);
+        main.setMaxSize(400,500);
         
         //setting column widths
         ColumnConstraints col1 = new ColumnConstraints();
